@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesh Beacon — Auburn ECE Capstone Team 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;500;600&display=swap">
+
+<style>
+:root{
+  --navy:#0C2340;
+  --ink:#0C2340;
+  --body:#42536A;
+  --muted:#6B7C93;
+  --bg:#F5F7FA;
+  --surface:#FFFFFF;
+  --surface-2:#EAEFF6;
+  --line:#D6DFEA;
+  --line-soft:#E6ECF4;
+  --accent:#E87722;
+  --accent-ink:#B0511A;
+  --on-accent:#FFFFFF;
+  --shadow:0 1px 2px rgba(12,35,64,.06), 0 12px 28px -12px rgba(12,35,64,.18);
+  --shadow-lift:0 2px 4px rgba(12,35,64,.08), 0 26px 44px -18px rgba(12,35,64,.30);
+  --grid-line:rgba(255,255,255,.075);
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --maxw:1180px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#EAF0F7;
+    --body:#B4C3D4;
+    --muted:#8496AB;
+    --bg:#071627;
+    --surface:#0E2138;
+    --surface-2:#122A45;
+    --line:#1E3A5C;
+    --line-soft:#16304E;
+    --accent:#F08A3C;
+    --accent-ink:#F5A05A;
+    --on-accent:#0A1A2C;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 30px -14px rgba(0,0,0,.6);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.45), 0 28px 50px -20px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#EAF0F7;
+  --body:#B4C3D4;
+  --muted:#8496AB;
+  --bg:#071627;
+  --surface:#0E2138;
+  --surface-2:#122A45;
+  --line:#1E3A5C;
+  --line-soft:#16304E;
+  --accent:#F08A3C;
+  --accent-ink:#F5A05A;
+  --on-accent:#0A1A2C;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 30px -14px rgba(0,0,0,.6);
+  --shadow-lift:0 2px 6px rgba(0,0,0,.45), 0 28px 50px -20px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:88px; -webkit-text-size-adjust:100%; overflow-x:clip}
+body{
+  margin:0; background:var(--bg); color:var(--body);
+  font-family:var(--f-body); font-size:17px; line-height:1.7;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased;
+  overflow-x:clip;
+}
+h1,h2,h3,h4{font-family:var(--f-display); color:var(--ink); margin:0; text-wrap:balance; letter-spacing:-.02em; line-height:1.1}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%; display:block}
+::selection{background:var(--accent); color:var(--on-accent)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:2px}
+
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 clamp(20px,5vw,48px)}
+.mono{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; font-weight:500}
+
+#progress{
+  position:fixed; top:0; left:0; height:3px; width:100%;
+  transform:scaleX(0); transform-origin:0 50%;
+  background:var(--accent); z-index:70;
+}
+
+#nav{
+  position:fixed; top:0; left:0; right:0; z-index:60;
+  border-bottom:1px solid transparent;
+  transition:background .4s var(--ease), border-color .4s var(--ease), backdrop-filter .4s var(--ease), padding .4s var(--ease);
+  padding:18px 0;
+}
+#nav.scrolled{
+  background:color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter:blur(14px) saturate(1.3);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);
+  border-bottom-color:var(--line);
+  padding:10px 0;
+}
+.nav-in{display:flex; align-items:center; gap:24px}
+.brand{display:flex; align-items:center; gap:12px; text-decoration:none; margin-right:auto; flex-shrink:0}
+.brand .mark{
+  width:34px; height:34px; border-radius:7px; flex-shrink:0;
+  background:var(--navy); color:#fff; display:grid; place-items:center;
+  font-family:var(--f-display); font-weight:800; font-size:.8rem; letter-spacing:.02em;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
+}
+#nav.scrolled .mark{background:var(--accent); color:var(--on-accent)}
+.brand .mark, #nav .brand-txt{transition:color .4s var(--ease), background .4s var(--ease)}
+.brand-txt{display:flex; flex-direction:column; line-height:1.25; color:#fff}
+#nav.scrolled .brand-txt{color:var(--ink)}
+.brand-txt b{font-family:var(--f-display); font-size:.9rem; font-weight:700; letter-spacing:-.01em}
+.brand-txt span{font-family:var(--f-mono); font-size:.63rem; letter-spacing:.16em; text-transform:uppercase; opacity:.72}
+
+.links{display:flex; align-items:center; gap:2px; position:relative}
+.links a{
+  position:relative; text-decoration:none; color:rgba(255,255,255,.78);
+  font-family:var(--f-display); font-weight:600; font-size:.83rem; letter-spacing:.01em;
+  padding:8px 12px; border-radius:6px; white-space:nowrap;
+  transition:color .25s var(--ease);
+}
+#nav.scrolled .links a{color:var(--muted)}
+.links a:hover{color:#fff}
+#nav.scrolled .links a:hover{color:var(--ink)}
+.links a.active{color:#fff}
+#nav.scrolled .links a.active{color:var(--ink)}
+#indicator{
+  position:absolute; bottom:-2px; left:0; height:2px; width:0;
+  background:var(--accent); border-radius:2px; opacity:0;
+  transition:transform .45s var(--ease), width .45s var(--ease), opacity .3s var(--ease);
+  pointer-events:none;
+}
+.burger{
+  display:none; width:40px; height:40px; border:1px solid rgba(255,255,255,.25);
+  background:transparent; border-radius:8px; cursor:pointer; padding:0;
+  place-items:center; flex-shrink:0;
+}
+#nav.scrolled .burger{border-color:var(--line)}
+.burger span{display:block; width:17px; height:1.5px; background:#fff; margin:3px auto; transition:transform .3s var(--ease), opacity .3s var(--ease)}
+#nav.scrolled .burger span{background:var(--ink)}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(4.5px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-4.5px) rotate(-45deg)}
+
+@media (max-width:940px){
+  .burger{display:grid}
+  .links{
+    position:fixed; top:0; right:0; height:100dvh; width:min(320px,84vw);
+    background:var(--surface); border-left:1px solid var(--line);
+    flex-direction:column; align-items:stretch; gap:2px;
+    padding:96px 20px 24px; z-index:65;
+    transform:translateX(102%); transition:transform .45s var(--ease);
+    box-shadow:var(--shadow-lift);
+  }
+  .links.open{transform:translateX(0)}
+  .links a, #nav.scrolled .links a{color:var(--ink); font-size:1rem; padding:12px 10px; border-bottom:1px solid var(--line-soft)}
+  .links a:last-of-type{border-bottom:0}
+  #indicator{display:none}
+  #scrim{
+    position:fixed; inset:0; background:rgba(7,22,39,.5); z-index:64;
+    opacity:0; pointer-events:none; transition:opacity .4s var(--ease);
+    -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+  }
+  #scrim.on{opacity:1; pointer-events:auto}
+}
+@media (min-width:941px){ #scrim{display:none} }
+
+#top{
+  position:relative; background:var(--navy); color:#fff; overflow:hidden;
+  padding:clamp(140px,17vw,190px) 0 clamp(70px,9vw,110px);
+  isolation:isolate;
+}
+#top::before{
+  content:""; position:absolute; inset:-60px;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(120% 90% at 78% 6%, #000 0%, transparent 72%);
+  mask-image:radial-gradient(120% 90% at 78% 6%, #000 0%, transparent 72%);
+  animation:drift 46s linear infinite; z-index:-2;
+}
+#top::after{
+  content:""; position:absolute; right:-14%; top:-32%; width:74vw; height:74vw;
+  background:radial-gradient(circle, rgba(232,119,34,.30) 0%, rgba(232,119,34,.10) 38%, transparent 68%);
+  z-index:-1; animation:breathe 15s ease-in-out infinite alternate;
+}
+@keyframes drift{to{background-position:64px 64px, 64px 64px}}
+@keyframes breathe{to{transform:translate3d(-3%,4%,0) scale(1.1)}}
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:12px; color:rgba(255,255,255,.72);
+  font-family:var(--f-mono); font-size:.72rem; letter-spacing:.2em; text-transform:uppercase;
+}
+.eyebrow::before{content:""; width:38px; height:1px; background:var(--accent)}
+h1{
+  font-size:clamp(2.7rem,7.6vw,5.6rem); font-weight:800; color:#fff;
+  letter-spacing:-.035em; line-height:.98; margin:24px 0 0; max-width:16ch;
+}
+.tagline{
+  margin-top:26px; max-width:56ch; font-size:clamp(1.02rem,1.7vw,1.2rem);
+  color:rgba(255,255,255,.78); line-height:1.65;
+}
+.rule{height:2px; background:var(--accent); margin:34px 0 0; transform-origin:0 50%; max-width:220px}
+.facts{
+  display:flex; flex-wrap:wrap; gap:0; margin-top:38px;
+  border-top:1px solid rgba(255,255,255,.14);
+}
+.fact{
+  padding:20px 30px 4px 0; margin-right:30px; min-width:132px;
+  border-right:1px solid rgba(255,255,255,.12);
+}
+.fact:last-child{border-right:0}
+.fact dt{color:rgba(255,255,255,.5); font-family:var(--f-mono); font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; margin:0}
+.fact dd{margin:8px 0 0; font-family:var(--f-display); font-weight:700; font-size:1.12rem; color:#fff; letter-spacing:-.01em}
+.fact dd em{font-style:normal; color:var(--accent)}
+.cta-row{display:flex; flex-wrap:wrap; gap:12px; margin-top:42px}
+.btn{
+  display:inline-flex; align-items:center; gap:10px; text-decoration:none;
+  font-family:var(--f-display); font-weight:600; font-size:.9rem;
+  padding:13px 22px; border-radius:9px; border:1px solid transparent;
+  transition:transform .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.btn.primary{background:var(--accent); color:#1B0E02; box-shadow:0 10px 24px -10px rgba(232,119,34,.8)}
+.btn.ghost{border-color:rgba(255,255,255,.3); color:#fff}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost:hover{border-color:#fff; background:rgba(255,255,255,.07)}
+.btn .arw{transition:transform .3s var(--ease)}
+.btn:hover .arw{transform:translateX(3px)}
+
+section.band{padding:clamp(72px,9vw,116px) 0; border-bottom:1px solid var(--line-soft)}
+section.band.alt{background:var(--surface)}
+.split{display:grid; grid-template-columns:minmax(0,210px) minmax(0,1fr); gap:clamp(28px,5vw,64px)}
+.split > *{min-width:0}
+.rail{position:sticky; top:104px; align-self:start}
+.rail .kicker{color:var(--accent-ink); display:block}
+.rail .note{margin-top:14px; font-size:.86rem; color:var(--muted); line-height:1.55; max-width:24ch}
+h2{font-size:clamp(1.75rem,3.6vw,2.5rem); font-weight:700; margin-bottom:8px}
+.lede{font-size:clamp(1.05rem,1.6vw,1.16rem); color:var(--body); max-width:66ch; margin-top:18px}
+.body-copy{max-width:66ch; margin-top:18px}
+.body-copy + .body-copy{margin-top:16px}
+@media (max-width:820px){
+  .split{grid-template-columns:1fr; gap:20px}
+  .rail{position:static}
+  .rail .note{max-width:none}
+}
+
+.grid{display:grid; gap:18px; margin-top:32px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(238px,1fr))}
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:24px; box-shadow:var(--shadow);
+  transition:transform .45s var(--ease), box-shadow .45s var(--ease), border-color .45s var(--ease);
+}
+section.band.alt .card{background:var(--bg)}
+.card:hover{transform:translateY(-4px); box-shadow:var(--shadow-lift); border-color:color-mix(in srgb, var(--accent) 45%, var(--line))}
+.card h3{font-size:1.06rem; font-weight:700; margin-bottom:8px}
+.card p{font-size:.95rem; line-height:1.62}
+.card .tag{
+  display:inline-block; font-family:var(--f-mono); font-size:.64rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent-ink); margin-bottom:12px;
+}
+.card .num{
+  font-family:var(--f-mono); font-size:.8rem; color:var(--accent-ink);
+  display:block; margin-bottom:10px; font-weight:600;
+}
+
+.team-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(228px,1fr)); gap:18px; margin-top:38px}
+.member{
+  background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:transform .5s var(--ease), box-shadow .5s var(--ease), border-color .5s var(--ease);
+}
+section.band.alt .member{background:var(--bg)}
+.member:hover{transform:translateY(-6px); box-shadow:var(--shadow-lift); border-color:color-mix(in srgb, var(--accent) 50%, var(--line))}
+.shot{
+  position:relative; aspect-ratio:4/5; overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 30% 12%, #163257 0%, var(--navy) 62%);
+  display:grid; place-items:center;
+}
+.shot img{width:100%; height:100%; object-fit:cover; transition:transform .7s var(--ease)}
+.member:hover .shot img{transform:scale(1.045)}
+.shot::after{
+  content:""; position:absolute; right:0; bottom:0; width:0; height:0;
+  border-style:solid; border-width:0 0 42px 42px;
+  border-color:transparent transparent var(--accent) transparent;
+  transition:border-width .45s var(--ease);
+}
+.member:hover .shot::after{border-width:0 0 58px 58px}
+.member .info{padding:20px}
+.member h3{font-size:1.14rem; font-weight:700}
+.member .role{
+  font-family:var(--f-mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-ink); margin-top:7px;
+}
+.member .bio{font-size:.92rem; line-height:1.6; margin-top:12px; color:var(--body)}
+
+.wbs-shell{
+  margin-top:34px; border:1px solid var(--line); border-radius:16px; background:var(--surface);
+  padding:26px 20px; overflow-x:auto; box-shadow:var(--shadow);
+}
+section.band.alt .wbs-shell{background:var(--bg)}
+.wbs-shell svg{min-width:760px; width:100%; height:auto; display:block}
+.wbs-box{fill:var(--surface-2); stroke:var(--line); stroke-width:1.5}
+.wbs-root{fill:var(--navy); stroke:var(--navy)}
+.wbs-t{font-family:var(--f-display); font-weight:700; font-size:14px; fill:var(--ink)}
+.wbs-root-t{fill:#fff; font-size:16px}
+.wbs-n{font-family:var(--f-mono); font-size:11px; font-weight:600; fill:var(--accent-ink); letter-spacing:.1em}
+.wbs-root-n{fill:var(--accent)}
+.wbs-link{stroke:var(--accent); stroke-width:2; fill:none; stroke-linecap:round}
+.draw{stroke-dasharray:var(--len); stroke-dashoffset:var(--len); transition:stroke-dashoffset 1.5s var(--ease) .15s}
+.in .draw{stroke-dashoffset:0}
+
+.tl{margin-top:34px; border-left:2px solid var(--line); padding-left:0; list-style:none}
+.tl li{position:relative; padding:0 0 30px 30px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{
+  content:""; position:absolute; left:-7px; top:7px; width:12px; height:12px; border-radius:50%;
+  background:var(--bg); border:2px solid var(--line); transition:background .4s var(--ease), border-color .4s var(--ease), transform .4s var(--ease);
+}
+section.band.alt .tl li::before{background:var(--surface)}
+.tl li:hover::before{background:var(--accent); border-color:var(--accent); transform:scale(1.2)}
+.tl .when{font-family:var(--f-mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-ink)}
+.tl h3{font-size:1.02rem; margin-top:6px}
+.tl p{font-size:.92rem; margin-top:5px}
+
+.doclist{list-style:none; padding:0; margin:30px 0 0; border-top:1px solid var(--line)}
+.doclist li{border-bottom:1px solid var(--line)}
+.doclist a{
+  display:flex; align-items:center; gap:16px; padding:18px 4px; text-decoration:none;
+  transition:padding .35s var(--ease), background .35s var(--ease);
+}
+.doclist a:hover{padding-left:14px; background:color-mix(in srgb, var(--accent) 7%, transparent)}
+.doclist .n{font-family:var(--f-mono); font-size:.72rem; color:var(--accent-ink); width:34px; flex-shrink:0}
+.doclist .t{font-family:var(--f-display); font-weight:600; color:var(--ink); font-size:1rem}
+.doclist .s{margin-left:auto; font-family:var(--f-mono); font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); white-space:nowrap}
+.doclist .arw{color:var(--accent); transition:transform .35s var(--ease); flex-shrink:0}
+.doclist a:hover .arw{transform:translateX(5px)}
+
+footer{background:var(--navy); color:rgba(255,255,255,.72); padding:64px 0 34px; position:relative; overflow:hidden}
+footer::before{
+  content:""; position:absolute; inset:0;
+  background-image:linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 70%);
+  mask-image:linear-gradient(180deg,#000,transparent 70%);
+}
+footer .wrap{position:relative}
+.f-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:36px}
+footer h4{color:#fff; font-size:.78rem; font-family:var(--f-mono); font-weight:500; letter-spacing:.16em; text-transform:uppercase; margin-bottom:16px; opacity:.62}
+footer .big{font-family:var(--f-display); font-size:1.42rem; font-weight:700; color:#fff; letter-spacing:-.02em; line-height:1.25}
+footer ul{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:9px}
+footer a{color:rgba(255,255,255,.72); text-decoration:none; font-size:.94rem; transition:color .25s var(--ease), transform .25s var(--ease); display:inline-block}
+footer a:hover{color:var(--accent); transform:translateX(3px)}
+.f-bot{
+  margin-top:48px; padding-top:22px; border-top:1px solid rgba(255,255,255,.13);
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between;
+  font-family:var(--f-mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45);
+}
+
+.reveal{opacity:0; transform:translateY(22px); transition:opacity .8s var(--ease), transform .8s var(--ease); transition-delay:var(--d,0ms)}
+.reveal.in{opacity:1; transform:none}
+.hero-anim{opacity:0; transform:translateY(26px); animation:rise .95s var(--ease) forwards; animation-delay:var(--d,0ms)}
+@keyframes rise{to{opacity:1; transform:none}}
+.rule.hero-anim{transform:scaleX(0) translateY(0); animation:wipe 1s var(--ease) forwards}
+@keyframes wipe{to{opacity:1; transform:scaleX(1)}}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
+  .reveal{opacity:1; transform:none}
+  .hero-anim{opacity:1; transform:none}
+  .rule.hero-anim{transform:scaleX(1)}
+  .draw{stroke-dashoffset:0}
+}
+</style>
+<style>
+.pill{display:inline-block; font-family:var(--f-mono); font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; padding:5px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted)}
+.pill.live{color:var(--accent-ink); border-color:color-mix(in srgb, var(--accent) 55%, var(--line)); background:color-mix(in srgb, var(--accent) 9%, transparent)}
+.pill.ok{color:#1F7A4A; border-color:#9ED3B5; background:rgba(31,122,74,.08)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.ok{color:#6FD39B; border-color:#2C6A49}}
+.stat{font-family:var(--f-display); font-weight:800; font-size:2.1rem; color:var(--ink); letter-spacing:-.03em; line-height:1}
+.stat small{display:block; font-family:var(--f-mono); font-weight:500; font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:10px}
+.stat.acc{color:var(--accent)}
+.sub{font-family:var(--f-display); font-size:1.1rem; font-weight:700; color:var(--ink); margin:38px 0 0}
+.sub:first-child{margin-top:0}
+.ticks{list-style:none; padding:0; margin:16px 0 0}
+.ticks li{position:relative; padding:7px 0 7px 26px; border-bottom:1px solid var(--line-soft); font-size:.97rem}
+.ticks li:last-child{border-bottom:0}
+.ticks li::before{content:""; position:absolute; left:2px; top:17px; width:8px; height:8px; border-radius:2px; background:var(--accent)}
+.weeknav{display:flex; flex-wrap:wrap; gap:10px; margin-top:34px}
+.weeknav a{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; text-decoration:none; color:#fff; border:1px solid rgba(255,255,255,.3); padding:9px 14px; border-radius:8px; transition:background .25s var(--ease), border-color .25s var(--ease)}
+.weeknav a:hover{border-color:#fff; background:rgba(255,255,255,.08)}
+.links a.back{color:var(--accent)}
+#nav.scrolled .links a.back{color:var(--accent-ink)}
+</style>
+
+</head>
+<body>
+<div id="progress"></div>
+
+<nav id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="index.html#top">
+      <span class="mark">AU</span>
+      <span class="brand-txt"><b>Team 4</b><span>ECE Capstone</span></span>
+    </a>
+    <div class="links" id="links">
+      <a href="#week5">Week 5</a>
+      <a href="#week4">Week 4</a>
+      <a href="#week3">Week 3</a>
+      <a href="#week2">Week 2</a>
+      <a href="#week1">Week 1</a>
+      <a class="back" href="index.html">&larr; Main site</a>
+      <span id="indicator"></span>
+    </div>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="links">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div id="scrim"></div>
+
+<header id="top">
+  <div class="wrap">
+    <span class="eyebrow hero-anim" style="--d:80ms">Mesh Beacon &middot; Team 4 &middot; ELEC 4010</span>
+    <h1 class="hero-anim" style="--d:180ms">Weekly status reports</h1>
+    <div class="rule hero-anim" style="--d:320ms"></div>
+    <p class="tagline hero-anim" style="--d:400ms">A running log of what the team decided, ordered, and built each week of Capstone Design I &mdash; newest first.</p>
+    <div class="weeknav hero-anim" style="--d:520ms">
+      <a href="#week5">Week 5</a><a href="#week4">Week 4</a><a href="#week3">Week 3</a><a href="#week2">Week 2</a><a href="#week1">Week 1</a>
+    </div>
+    <div class="cta-row hero-anim" style="--d:600ms">
+      <a class="btn primary" href="index.html#top"><span class="arw" style="transform:none">&larr;</span> Back to main site</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="band" id="week5">
+  <div class="wrap">
+    <div class="split">
+      <div class="rail reveal">
+        <span class="kicker mono">Week 5</span>
+        <p class="note">September 30, 2026</p>
+        <p style="margin-top:14px"><span class="pill live">In development</span></p>
+      </div>
+      <div>
+        <h2 class="reveal">Parts ordering &amp; budget match</h2>
+        
+<h3 class="sub">This week's updates</h3>
+<div class="grid g2"><div class="card reveal"><h3>Team Meeting &mdash; Parts Ordering Strategy</h3><p>Discussed how to move forward in ordering components to start the prototype build. Team agreed on the initial component set to reach the $200 spending goal for the project budget match.</p></div></div>
+<h3 class="sub">Components ordered</h3>
+<div class="grid g3">
+<div class="card reveal"><h3>WisBlock Meshtastic Starter Kit</h3><p>RAK4631 LoRa module with pre-flashed Meshtastic firmware, RAK19007 base, USB cable, antenna included.</p><p style='margin-top:12px'><span class='pill ok'>&check; Ordered</span></p></div>
+<div class="card reveal"><h3>Barometric Pressure Sensor (RAK1902)</h3><p>Environmental telemetry &mdash; measures air pressure for weather monitoring.</p><p style='margin-top:12px'><span class='pill ok'>&check; Ordered</span></p></div>
+<div class="card reveal"><h3>Temperature &amp; Humidity Sensor (RAK1901)</h3><p>Environmental telemetry &mdash; integrated into the WisBlock base for environmental monitoring.</p><p style='margin-top:12px'><span class='pill ok'>&check; Ordered</span></p></div>
+</div>
+<h3 class="sub">Budget status</h3>
+<div class="grid g3">
+<div class="card reveal"><div class="stat acc">$60<small>Spent (w/ shipping)</small></div></div>
+<div class="card reveal"><div class="stat">$200<small>Goal for budget match</small></div></div>
+<div class="card reveal"><div class="stat">$400<small>Total team budget</small></div></div>
+</div>
+<h3 class="sub">Next week's focus</h3>
+<ul class="ticks"><li>Continue procuring additional components</li><li>Work toward the $200 spending goal to unlock the additional $200 budget match</li><li>Begin ESP32 and power system component selection</li><li>Finalize CAD model dimensions with real parts in hand</li></ul>
+
+      </div>
+    </div>
+  </div>
+</section>
+<section class="band alt" id="week4">
+  <div class="wrap">
+    <div class="split">
+      <div class="rail reveal">
+        <span class="kicker mono">Week 4</span>
+        <p class="note">September 16&ndash;23, 2026</p>
+        <p style="margin-top:14px"><span class="pill">Completed</span></p>
+      </div>
+      <div>
+        <h2 class="reveal">Architecture locked in</h2>
+        
+<h3 class="sub">Completed this week</h3>
+<div class="grid g2"><div class="card reveal"><h3>Architecture Meeting with Meshtastic Experts</h3><p>Met with experienced Meshtastic and LoRa developers to finalize the system architecture. Key decisions made:</p><ul class="ticks"><li>Confirmed dual-microcontroller design: RAK4631 (Meshtastic) + ESP32 (WiFi bridge)</li><li>Serial Module configuration: TEXTMSG mode, 38400 baud, GPS disabled (UART conflict)</li><li>Decided against a custom PCB for v1 &mdash; off-the-shelf modules only</li><li>Antenna placement is critical &mdash; must extend above the enclosure for range</li></ul></div></div>
+<h3 class="sub">Technical decisions locked in</h3>
+<div class="grid g3">
+<div class="card reveal"><span class="tag">Radio</span><h3>Radio Module</h3><p>RAK4631 WisBlock &mdash; US915 pre-flashed with Meshtastic firmware. Stock firmware, no modifications.</p></div>
+<div class="card reveal"><span class="tag">Phone link</span><h3>WiFi Bridge</h3><p>ESP32 &mdash; hosts the AP and web server. Users connect via browser, no app install required.</p></div>
+<div class="card reveal"><span class="tag">Power</span><h3>Power Architecture</h3><p>12V LiFePO4 main + 3.7V LiPo backup (radio only) + solar charging.</p></div>
+</div>
+<h3 class="sub">References &amp; resources identified</h3>
+<ul class="ticks"><li>AltaVox Beacon (sizing/features reference)</li><li>Auburn Meshtastic Club (local node network and support)</li><li>MeshCore documentation (reference only for phase 2)</li><li>Coverage prediction tools for antenna optimization</li></ul>
+
+      </div>
+    </div>
+  </div>
+</section>
+<section class="band" id="week3">
+  <div class="wrap">
+    <div class="split">
+      <div class="rail reveal">
+        <span class="kicker mono">Week 3</span>
+        <p class="note">September 9&ndash;15, 2026</p>
+        <p style="margin-top:14px"><span class="pill">Completed</span></p>
+      </div>
+      <div>
+        <h2 class="reveal">Planning &amp; roles</h2>
+        
+<h3 class="sub">Initial planning phase</h3>
+<div class="grid g2"><div class="card reveal"><h3>Project Kickoff &amp; Brainstorming</h3><p>Team began detailed brainstorming on the Mesh Beacon concept. Discussed deployment scenarios, use cases (FEMA, search &amp; rescue), and the initial design approach.</p></div></div>
+<h3 class="sub">Roles assigned</h3>
+<div class="grid g3">
+<div class="card reveal"><span class="tag">Concept Lead &amp; Enclosure</span><h3>Sean Whitley</h3><p>CAD design, 3D printing, mechanical integration</p></div>
+<div class="card reveal"><span class="tag">Mesh Network &amp; Radios</span><h3>Sky Braley</h3><p>LoRa radio configuration, Meshtastic setup</p></div>
+<div class="card reveal"><span class="tag">Phone Connectivity</span><h3>Mia Haefner</h3><p>ESP32 web bridge development, user interface</p></div>
+<div class="card reveal"><span class="tag">Power System</span><h3>Jacob Volkers</h3><p>Battery, solar, voltage regulation</p></div>
+<div class="card reveal"><span class="tag">Environmental Sensors</span><h3>Reagan Wright</h3><p>Temperature, humidity, pressure sensors</p></div>
+<div class="card reveal"><span class="tag">Integration Lead</span><h3>Morgan Reilly</h3><p>System assembly, demos, documentation</p></div>
+</div>
+<h3 class="sub">Initial research</h3>
+<ul class="ticks"><li>Identified AltaVox Beacon as reference design</li><li>Researched Meshtastic ecosystem and LoRa capabilities</li><li>Outlined power budget requirements</li><li>Started component research</li></ul>
+
+      </div>
+    </div>
+  </div>
+</section>
+<section class="band alt" id="week2">
+  <div class="wrap">
+    <div class="split">
+      <div class="rail reveal">
+        <span class="kicker mono">Week 2</span>
+        <p class="note">September 2&ndash;8, 2026</p>
+        <p style="margin-top:14px"><span class="pill">Completed</span></p>
+      </div>
+      <div>
+        <h2 class="reveal">Project definition</h2>
+        
+<h3 class="sub">Project definition</h3>
+<div class="grid g2"><div class="card reveal"><h3>Capstone Design Proposal Completed</h3><p>Finalized and submitted the Capstone Design Proposal (CDP) to Dr. Geiger. The document includes:</p><ul class="ticks"><li>Project overview and vision</li><li>Customer identification (emergency responders, off-grid communities)</li><li>Technical approach and alternatives considered</li><li>Resource requirements and budget</li><li>Team member assignments</li></ul></div>
+<div class="card reveal"><h3>Website Launched</h3><p>Created the team project website to document progress and share information with stakeholders.</p></div></div>
+
+      </div>
+    </div>
+  </div>
+</section>
+<section class="band" id="week1">
+  <div class="wrap">
+    <div class="split">
+      <div class="rail reveal">
+        <span class="kicker mono">Week 1</span>
+        <p class="note">August 26 &ndash; September 1, 2026</p>
+        <p style="margin-top:14px"><span class="pill">Completed</span></p>
+      </div>
+      <div>
+        <h2 class="reveal">Project formation</h2>
+        
+<h3 class="sub">Project formation</h3>
+<div class="grid g2">
+<div class="card reveal"><h3>Team Assembled</h3><p>Auburn ECE Team 4 formed for the Capstone Design course. Six members with complementary skills in electronics, networking, and mechanical engineering.</p></div>
+<div class="card reveal"><h3>Initial Concept</h3><p>Developed the core idea: a portable, solar-powered emergency communication station using Meshtastic mesh networking for deployment when cellular networks are unavailable.</p></div>
+</div>
+<h3 class="sub">What is the Mesh Beacon?</h3>
+<p class="body-copy reveal">A field-deployable communication device that:</p>
+<ul class="ticks"><li>Provides mesh network communication when cellular networks are down</li><li>Charges mobile devices via solar power</li><li>Can be carried and deployed by one person</li><li>Connects phones via WiFi (no app needed)</li><li>Relays messages across miles using LoRa radio</li></ul>
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div><h4>Project</h4><p class="big">Mesh Beacon</p><p style="margin-top:12px; font-size:.94rem">Team 4 &middot; Semester 1 of 2</p></div>
+      <div><h4>Navigate</h4><ul><li><a href="index.html">Main site</a></li><li><a href="index.html#team">Team</a></li><li><a href="index.html#documents">Documents</a></li></ul></div>
+      <div><h4>Contact</h4><ul><li><a href="mailto:morganakreilly@gmail.com">Team email</a></li><li><a href="https://www.eng.auburn.edu/ece/">Auburn ECE Department</a></li><li><span style="font-size:.94rem">ELEC 4010 &middot; Dr. Geiger</span></li></ul></div>
+    </div>
+    <div class="f-bot"><span>Auburn University &middot; Samuel Ginn College of Engineering</span><span>Capstone Design I &amp; II</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var nav=document.getElementById('nav'), links=document.getElementById('links'), burger=document.getElementById('burger'),
+      scrim=document.getElementById('scrim'), indicator=document.getElementById('indicator'), bar=document.getElementById('progress');
+  var anchors=Array.prototype.slice.call(links.querySelectorAll('a[href^="#"]'));
+  var sections=anchors.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  var ticking=false;
+  function onScroll(){
+    if(ticking)return; ticking=true;
+    requestAnimationFrame(function(){
+      var y=window.scrollY||document.documentElement.scrollTop;
+      nav.classList.toggle('scrolled',y>40);
+      var h=document.documentElement.scrollHeight-window.innerHeight;
+      bar.style.transform='scaleX('+(h>0?Math.min(y/h,1):0)+')';
+      ticking=false;
+    });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  function setMenu(o){links.classList.toggle('open',o);scrim.classList.toggle('on',o);burger.setAttribute('aria-expanded',o?'true':'false');}
+  burger.addEventListener('click',function(){setMenu(!links.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setMenu(false);});
+  links.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){setMenu(false);});});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setMenu(false);});
+  function move(el){
+    if(!el||window.innerWidth<=940){indicator.style.opacity=0;return;}
+    indicator.style.width=el.offsetWidth+'px';indicator.style.transform='translateX('+el.offsetLeft+'px)';indicator.style.opacity=1;
+  }
+  function setActive(id){var cur=null;anchors.forEach(function(a){var on=a.getAttribute('href')==='#'+id;a.classList.toggle('active',on);if(on)cur=a;});move(cur);}
+  var spy=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)setActive(e.target.id);});},{rootMargin:'-45% 0px -50% 0px',threshold:0});
+  sections.forEach(function(s){if(s)spy.observe(s);});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px',threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+  window.addEventListener('resize',function(){move(links.querySelector('a.active'));});
+})();
+</script>
+</body>
+</html>
