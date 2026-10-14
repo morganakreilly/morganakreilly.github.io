@@ -75,6 +75,33 @@
             align-items: center;
         }
 
+        .nav-switcher {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-switcher a {
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: 2px solid var(--navy);
+            color: var(--navy);
+        }
+
+        .nav-switcher a.active {
+            background: var(--navy);
+            color: white;
+        }
+
+        .nav-switcher a:hover {
+            background: var(--navy);
+            color: white;
+        }
+
         .week-tab {
             padding: 8px 16px;
             border: 2px solid var(--navy);
@@ -353,9 +380,9 @@
     <nav>
         <div class="nav-content">
             <a href="#" class="nav-logo">Mesh Beacon</a>
-            <div style="font-size: 12px; margin-right: 20px;">
-                <a href="index.html" style="font-weight: 600; color: #0C2340;">Weekly Progress</a> |
-                <a href="full.html" style="color: #6B7C93;">Full Dashboard</a>
+            <div class="nav-switcher">
+                <a href="index.html" class="active">Weekly Progress</a>
+                <a href="full.html">Full Dashboard</a>
             </div>
             <div class="week-tabs">
                 <button class="week-tab active" onclick="showPage('week5')">Week 5 (Current)</button>
