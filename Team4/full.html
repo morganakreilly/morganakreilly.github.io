@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Mesh Beacon - Team 4 Capstone</title>
+    <style>
+        :root {
+            --navy: #0C2340;
+            --orange: #E87722;
+            --light-bg: #f8f9fa;
+            --dark-bg: #1a1a1a;
+            --light-text: #333;
+            --dark-text: #e0e0e0;
+            --light-card: #ffffff;
+            --dark-card: #2a2a2a;
+            --success: #28a745;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --light-bg: var(--dark-bg);
+                --light-text: var(--dark-text);
+                --light-card: var(--dark-card);
+            }
+        }
+
+        [data-theme="dark"] {
+            --light-bg: var(--dark-bg);
+            --light-text: var(--dark-text);
+            --light-card: var(--dark-card);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--light-bg);
+            color: var(--light-text);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--light-card);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+
+        [data-theme="dark"] nav {
+            background: rgba(42,42,42,0.95);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--navy);
+            text-decoration: none;
+        }
+
+        .nav-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--navy), var(--orange));
+            width: 80px;
+            left: 20px;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            color: var(--navy);
+        }
+
+        main {
+            margin-top: 60px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #051830 100%);
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(232,119,34,0.1) 0%, transparent 50%);
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .hero .subtitle {
+            color: var(--orange);
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 16px;
+        }
+
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            opacity: 1;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section.reveal-on-scroll {
+            animation: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        section.reveal-on-scroll.in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--navy);
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--orange);
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 12px;
+        }
+
+        .section-alt {
+            background: var(--light-card);
+        }
+
+        .card {
+            background: var(--light-card);
+            border: 1px solid rgba(12, 35, 64, 0.1);
+            border-radius: 8px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--orange);
+            box-shadow: 0 4px 16px rgba(232,119,34,0.15);
+            transform: translateY(-4px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--orange);
+        }
+
+        .card p {
+            margin-bottom: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .grid-item {
+            background: var(--light-card);
+            border: 1px solid rgba(12, 35, 64, 0.1);
+            border-radius: 8px;
+            padding: 24px;
+            border-left: 4px solid var(--orange);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .grid-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+
+        .grid-item h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 12px;
+            margin-top: 0;
+        }
+
+        .grid-item p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--navy), var(--orange));
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .stat-box {
+            background: var(--light-card);
+            border: 2px solid var(--orange);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--orange);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--light-text);
+            margin-top: 8px;
+        }
+
+        ul, ol {
+            margin-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.8;
+        }
+
+        .component-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .component-item {
+            background: var(--light-card);
+            border-left: 4px solid var(--success);
+            padding: 16px;
+            border-radius: 4px;
+        }
+
+        .component-item.pending {
+            border-left-color: var(--warning);
+        }
+
+        .component-item.complete {
+            border-left-color: var(--success);
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            margin-left: 40px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            background: var(--orange);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--navy);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 35px;
+            width: 2px;
+            height: calc(100% + 30px);
+            background: var(--orange);
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: var(--orange);
+            font-size: 14px;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+            margin: 4px 0;
+        }
+
+        .team-member {
+            background: var(--light-card);
+            border: 1px solid rgba(12, 35, 64, 0.1);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover {
+            box-shadow: 0 8px 24px rgba(232,119,34,0.2);
+            transform: translateY(-8px);
+        }
+
+        .team-member-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+            margin: 12px 0 4px;
+        }
+
+        .team-member-role {
+            font-size: 14px;
+            color: var(--orange);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .team-member-task {
+            font-size: 13px;
+            color: var(--light-text);
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        footer p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .footer-links {
+            margin-top: 20px;
+        }
+
+        .footer-links a {
+            color: var(--orange);
+            text-decoration: none;
+            margin: 0 16px;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-ordered {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-inprogress {
+            background: var(--info);
+            color: white;
+        }
+
+        .badge-pending {
+            background: var(--warning);
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            nav { position: relative; }
+            .hero { padding: 60px 20px; }
+            section { padding: 40px 20px; }
+            .grid { grid-template-columns: 1fr; }
+            h2 { font-size: 28px; }
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .specs-table th,
+        .specs-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(12, 35, 64, 0.1);
+        }
+
+        .specs-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: 600;
+        }
+
+        .specs-table tr:hover {
+            background: var(--light-bg);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <a href="#" class="nav-logo">Survival Mesh Beacon</a>
+            <div style="font-size: 12px; margin-right: 20px;">
+                <a href="index.html" style="color: #6B7C93;">Weekly Progress</a> |
+                <a href="full.html" style="font-weight: 600; color: #0C2340;">Full Dashboard</a>
+            </div>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+        </div>
+        <div class="nav-indicator" id="navIndicator"></div>
+    </nav>
+
+    <main>
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Survival Mesh Beacon</h1>
+                <p>and Battery Bank</p>
+                <p class="subtitle">Emergency Communication & Charging Station</p>
+                <p class="subtitle" style="font-size: 16px; margin-top: 16px;">Auburn ECE Team 4 - Capstone Semester 1</p>
+                <div class="status-badge">✓ In Active Development</div>
+            </div>
+        </section>
+
+        <!-- Quick Status -->
+        <section class="reveal-on-scroll section-alt" id="status">
+            <h2>Project Status - Week 5</h2>
+            <div class="grid">
+                <div class="stat-box">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Components Ordered</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">$60</div>
+                    <div class="stat-label">Spent (w/ shipping)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">$400</div>
+                    <div class="stat-label">Total Budget</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">50%</div>
+                    <div class="stat-label">Phase 1 Complete</div>
+                </div>
+            </div>
+            
+            <h3>Latest Updates</h3>
+            <div class="card">
+                <p><strong>September 30, 2026:</strong> Team meeting completed on component ordering strategy and prototype build plan. Key items ordered to reach $200 spending goal for additional project funding ($200 match).</p>
+                <p><strong>Components Ordered:</strong></p>
+                <ul>
+                    <li><span class="badge badge-ordered">Ordered</span> WisBlock Meshtastic Starter Kit (RAK4631)</li>
+                    <li><span class="badge badge-ordered">Ordered</span> Barometric Pressure Sensor (RAK1902)</li>
+                    <li><span class="badge badge-ordered">Ordered</span> Temperature and Humidity Sensor (RAK1901)</li>
+                </ul>
+                <p style="margin-top: 16px;"><strong>Next Steps:</strong> Reach $200 spending threshold to unlock additional $200 budget. Continue with power system components and ESP32 procurement.</p>
+            </div>
+        </section>
+
+        <!-- Architecture Overview -->
+        <section class="reveal-on-scroll" id="architecture">
+            <h2>System Architecture</h2>
+            
+            <h3>Dual-Microcontroller Design</h3>
+            <div class="card">
+                <p>The Mesh Beacon uses two separate microcontrollers working together:</p>
+                <ul>
+                    <li><strong>RAK4631 (WisBlock Core):</strong> Runs stock Meshtastic firmware. Handles all mesh networking and LoRa radio communication. Connects via Serial Module (UART) to the ESP32 bridge.</li>
+                    <li><strong>ESP32 WiFi Bridge:</strong> Hosts a WiFi access point and web server. Phones connect to the on-device WiFi (no app install needed) and open a browser to send/view messages and check battery status.</li>
+                </ul>
+                <p style="margin-top: 16px;"><strong>Why two boards?</strong> The RAK4631 has no WiFi (saves power), so the ESP32 bridge provides user-facing connectivity while keeping the mesh radio efficient and unmodified.</p>
+            </div>
+
+            <h3>Board Specifications</h3>
+            <table class="specs-table">
+                <tr>
+                    <th>Component</th>
+                    <th>Specifications</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td><strong>RAK19007 (WisBlock Base)</strong></td>
+                    <td>60×30mm, 4 mounting holes @ 48×22mm</td>
+                    <td><span class="badge badge-ordered">Ordered</span></td>
+                </tr>
+                <tr>
+                    <td><strong>RAK4631 (LoRa Radio)</strong></td>
+                    <td>LoRa @ US915, Meshtastic firmware pre-flashed</td>
+                    <td><span class="badge badge-ordered">Ordered</span></td>
+                </tr>
+                <tr>
+                    <td><strong>RAK1901 (Temp/Humidity)</strong></td>
+                    <td>Integrated in WisBlock Base (Slot B)</td>
+                    <td><span class="badge badge-ordered">Ordered</span></td>
+                </tr>
+                <tr>
+                    <td><strong>RAK1902 (Barometric Pressure)</strong></td>
+                    <td>Integrated in WisBlock Base (Slot C)</td>
+                    <td><span class="badge badge-ordered">Ordered</span></td>
+                </tr>
+                <tr>
+                    <td><strong>ESP32-DevKitC V4</strong></td>
+                    <td>48.26×27.94mm, WiFi + Bluetooth</td>
+                    <td><span class="badge badge-pending">Pending</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Serial Connection</strong></td>
+                    <td>38400 baud, TEXTMSG mode, J10 TX1/RX1</td>
+                    <td><span class="badge badge-inprogress">In Design</span></td>
+                </tr>
+            </table>
+
+            <h3>Power System Architecture</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>Main Battery</h4>
+                    <p><strong>12V LiFePO4</strong> (LFP)<br/>
+                    • 20Ah capacity<br/>
+                    • Safer for field use<br/>
+                    • Rugged chemistry<br/>
+                    • Handles rapid discharge for phone charging</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Backup Battery</h4>
+                    <p><strong>3.7V LiPo</strong> (RAK19007 Port P2)<br/>
+                    • Dedicated to mesh radio<br/>
+                    • Board charges from 5V supply<br/>
+                    • Auto failover when main depletes<br/>
+                    • No diode module needed</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Solar Input</h4>
+                    <p><strong>20W Solar Panel</strong><br/>
+                    • ACOPOWER HY-12M-20W<br/>
+                    • 345×470mm (secured via straps)<br/>
+                    • Renogy 10A PWM controller<br/>
+                    • Mounted separately on case</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Voltage Regulation</h4>
+                    <p><strong>5V/USB-C Output</strong><br/>
+                    • Pololu 5V regulator (internal)<br/>
+                    • 12V→5V USB-C buck converter (phone charging)<br/>
+                    • INA219 battery monitor (tracks charge state)</p>
+                </div>
+            </div>
+
+            <h3>Range & Antenna</h3>
+            <div class="card">
+                <p><strong>Target Range:</strong> 2-5 miles per hop in Auburn/Opelika area</p>
+                <p><strong>Critical Factor:</strong> Antenna height matters far more than transmit power. Ground-level antennas lose significant range vs. elevated ones.</p>
+                <ul>
+                    <li>Use coverage-prediction tools (MeshCore app) before finalizing antenna placement</li>
+                    <li>Antenna must be able to extend above the enclosure, not just a stub on the backpack</li>
+                    <li><strong>Safety:</strong> NEVER power the radio without antenna attached — reflected power can damage the transmitter</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Components & Budget -->
+        <section class="reveal-on-scroll section-alt" id="components">
+            <h2>Components & Budget Tracking</h2>
+            
+            <div class="card">
+                <h3>Budget Status</h3>
+                <p><strong>Total Allocated:</strong> $400</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 15%;"></div>
+                </div>
+                <p><strong>Spent so far:</strong> $60 (with shipping)</p>
+                <p><strong>Budget Goal:</strong> Reach $200 to unlock additional $200 team funding</p>
+                <p style="margin-top: 16px; font-size: 14px; opacity: 0.8;"><em>Progress: 30% toward funding goal</em></p>
+            </div>
+
+            <h3>Ordered Components</h3>
+            <div class="component-list">
+                <div class="component-item complete">
+                    <strong>WisBlock Meshtastic Starter Kit</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">Includes RAK4631 (LoRa), RAK19007 base, USB cable, antenna</p>
+                    <p style="font-size: 12px; color: var(--success); font-weight: 600;">✓ Ordered</p>
+                </div>
+                <div class="component-item complete">
+                    <strong>RAK1901 (Temperature/Humidity)</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">Environmental telemetry sensor</p>
+                    <p style="font-size: 12px; color: var(--success); font-weight: 600;">✓ Ordered</p>
+                </div>
+                <div class="component-item complete">
+                    <strong>RAK1902 (Barometric Pressure)</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">Environmental telemetry sensor</p>
+                    <p style="font-size: 12px; color: var(--success); font-weight: 600;">✓ Ordered</p>
+                </div>
+            </div>
+
+            <h3>Planned Components (Budget $140-$300)</h3>
+            <div class="component-list">
+                <div class="component-item pending">
+                    <strong>ESP32-DevKitC V4</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">WiFi bridge & web server</p>
+                    <p style="font-size: 12px; color: var(--warning); font-weight: 600;">⏳ Pending</p>
+                </div>
+                <div class="component-item pending">
+                    <strong>12V LiFePO4 Battery</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">Bioenno 20Ah main battery</p>
+                    <p style="font-size: 12px; color: var(--warning); font-weight: 600;">⏳ Pending</p>
+                </div>
+                <div class="component-item pending">
+                    <strong>Solar Panel & Controller</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">ACOPOWER 20W + Renogy 10A PWM</p>
+                    <p style="font-size: 12px; color: var(--warning); font-weight: 600;">⏳ Pending</p>
+                </div>
+                <div class="component-item pending">
+                    <strong>Voltage Regulators & Converters</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">5V regulator, USB-C buck, INA219 monitor</p>
+                    <p style="font-size: 12px; color: var(--warning); font-weight: 600;">⏳ Pending</p>
+                </div>
+                <div class="component-item pending">
+                    <strong>3.7V LiPo Backup Battery</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">Radio-dedicated fallback power</p>
+                    <p style="font-size: 12px; color: var(--warning); font-weight: 600;">⏳ Pending</p>
+                </div>
+                <div class="component-item pending">
+                    <strong>Enclosure Hardware</strong>
+                    <p style="margin: 8px 0 4px; font-size: 13px;">Latches, hinge, gasket, carry handle</p>
+                    <p style="font-size: 12px; color: var(--warning); font-weight: 600;">⏳ Pending</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Timeline -->
+        <section class="reveal-on-scroll" id="timeline">
+            <h2>Project Timeline & Milestones</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 1-4 (Sept 10-26)</div>
+                    <div class="timeline-title">Design & Planning Phase</div>
+                    <p>Architecture meetings with Meshtastic community experts, component research, CAD model creation, parts list finalization</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-ordered">✓ Complete</span></p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 5-6 (Sept 30-Oct 7)</div>
+                    <div class="timeline-title">Initial Component Ordering</div>
+                    <p>Order mesh radio kit and sensor modules. Reach $200 spending goal for budget match approval.</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-inprogress">In Progress</span> - 3 items ordered, $60 spent</p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 7-10 (Oct 14-Nov 4)</div>
+                    <div class="timeline-title">Enclosure Design & Fabrication</div>
+                    <p>Finalize CAD model with real component dimensions. 3D print prototype base/lid. Order latch/hinge hardware.</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-pending">Pending</span></p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 7-10 (Oct 14-Nov 4)</div>
+                    <div class="timeline-title">Power System Build</div>
+                    <p>Assemble battery pack, solar controller, voltage regulators. Test USB-C phone charging under load.</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-pending">Pending</span></p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 7-9 (Oct 14-28)</div>
+                    <div class="timeline-title">Mesh Radio Configuration</div>
+                    <p>Flash RAK4631 with Meshtastic. Configure Serial Module, set US915 region, test multi-hop packet relay.</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-pending">Pending</span></p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 8-10 (Oct 21-Nov 4)</div>
+                    <div class="timeline-title">ESP32 Web Bridge Development</div>
+                    <p>Build ESP32 WiFi AP and web server. Serial connection to mesh radio. Add message UI and battery monitoring.</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-pending">Pending</span></p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 11-13 (Nov 11-25)</div>
+                    <div class="timeline-title">System Integration & Testing</div>
+                    <p>Assemble all subsystems into enclosure. Bench test end-to-end: solar charging, phone connectivity, mesh relay.</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-pending">Pending</span></p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Weeks 14-15 (Dec 2-13)</div>
+                    <div class="timeline-title">Field Testing & Documentation</div>
+                    <p>Range testing in Auburn/Opelika. Finalize user guide. Prepare capstone presentation.</p>
+                    <p style="margin-top: 8px; font-size: 13px;"><strong>Status:</strong> <span class="badge badge-pending">Pending</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Assignments -->
+        <section class="reveal-on-scroll section-alt" id="team">
+            <h2>Team Members & Assignments</h2>
+            <div class="grid">
+                <div class="team-member">
+                    <div class="team-member-name">Morgan Reilly</div>
+                    <div class="team-member-role">Integration Lead</div>
+                    <div class="team-member-task">System assembly, end-to-end testing, capstone deliverables, demo preparation, website</div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-member-name">Sean Whitley</div>
+                    <div class="team-member-role">Concept Lead & Enclosure</div>
+                    <div class="team-member-task">3D CAD design (OpenSCAD), prototype printing, antenna mounting, hardware integration</div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-member-name">Sky Braley</div>
+                    <div class="team-member-role">Mesh Network & Radios</div>
+                    <div class="team-member-task">RAK4631 configuration, Meshtastic setup, serial module enablement, range testing</div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-member-name">Mia Haefner</div>
+                    <div class="team-member-role">Phone Connectivity & Bridge</div>
+                    <div class="team-member-task">ESP32 web server development, WiFi AP setup, message UI, field usability testing</div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-member-name">Jacob Volkers</div>
+                    <div class="team-member-role">Power System & Battery</div>
+                    <div class="team-member-task">Battery assembly, solar panel setup, voltage regulator wiring, USB-C charging verification</div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-member-name">Reagan Wright</div>
+                    <div class="team-member-role">Environmental Sensors</div>
+                    <div class="team-member-task">Temperature/humidity/pressure sensor integration, telemetry setup, data logging</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Resources -->
+        <section class="reveal-on-scroll" id="resources">
+            <h2>Key Resources & Documentation</h2>
+            
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>Technical Documentation</h4>
+                    <ul>
+                        <li>Prototype Architecture (detailed)</li>
+                        <li>Parts List & Pricing</li>
+                        <li>Wiring Netlist (pin-to-pin)</li>
+                        <li>OpenSCAD Enclosure Model</li>
+                        <li>ESP32 Bridge Firmware</li>
+                    </ul>
+                </div>
+
+                <div class="grid-item">
+                    <h4>Community & Expertise</h4>
+                    <ul>
+                        <li>Auburn Meshtastic Club</li>
+                        <li>Meshtastic Official Docs</li>
+                        <li>WisBlock Developer Docs</li>
+                        <li>MeshCore Firmware (phase 2)</li>
+                        <li>Coverage Prediction Tools</li>
+                    </ul>
+                </div>
+
+                <div class="grid-item">
+                    <h4>Design References</h4>
+                    <ul>
+                        <li>AltaVox Beacon (sizing)</li>
+                        <li>RAK WisBlock Ecosystem</li>
+                        <li>Meshtastic LoRa Config</li>
+                        <li>Parker O-Ring Gasket Specs</li>
+                        <li>NASA Weather Data API</li>
+                    </ul>
+                </div>
+
+                <div class="grid-item">
+                    <h4>Testing & Validation</h4>
+                    <ul>
+                        <li>Bench testing procedures</li>
+                        <li>Auburn-Opelika range map</li>
+                        <li>Phone charging load test</li>
+                        <li>Waterproofing validation</li>
+                        <li>Field deployment checklist</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Subject Matter Experts Available</h3>
+            <div class="card">
+                <ul>
+                    <li><strong>Auburn Meshtastic Club:</strong> Configuration, local node locations, antenna optimization</li>
+                    <li><strong>Auburn ECE Faculty (Wireless Comms):</strong> LoRa protocol, RF antenna design</li>
+                    <li><strong>Auburn ECE Faculty (Power Systems):</strong> Battery management, solar charging architecture</li>
+                    <li><strong>Steven Moore (Wilmore Research Lab):</strong> 3D fabrication, enclosure design, material selection</li>
+                    <li><strong>Disaster Comms Expert (if available):</strong> Real-world deployment validation</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- What's Deferred -->
+        <section class="reveal-on-scroll section-alt" id="deferred">
+            <h2>Phase 2 Features (Deferred to Next Semester)</h2>
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>Redundancy & Failsafes</h4>
+                    <p>Advanced backup systems beyond basic main→backup battery fallover. Multi-level failover logic, watchdog timers, fault detection.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Universal Power Input</h4>
+                    <p>\"Whatever's plugged in\" power conversion. Accept multiple input voltages and automatically step to battery requirements.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Multi-Protocol Firmware</h4>
+                    <p>Switch between Meshtastic, MeshCore, and Reticulum protocols on one device via firmware selection. Added complexity deferred.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Custom Mobile App</h4>
+                    <p>Dedicated phone app. Decided against in favor of browser-based web UI — simpler, updates without app store delays.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>GPS & Asset Tracking</h4>
+                    <p>GNSS module integration (RAK12501). Distress broadcast if unit moved. Uses accelerometer from GPS bundle.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Custom PCB</h4>
+                    <p>Custom-designed PCB for integrated electronics. Phase 1 uses off-the-shelf modules only to stay on schedule.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section class="reveal-on-scroll" id="contact">
+            <h2>Contact & Questions</h2>
+            <div class="card">
+                <p>Have questions about the project? Want to collaborate or contribute expertise?</p>
+                <p><strong>Team Email:</strong> Auburn ECE Team 4 Capstone (via Auburn Portal)</p>
+                <p><strong>Project Lead:</strong> Morgan Reilly</p>
+                <p><strong>Advisor:</strong> Dr. Geiger (Auburn ECE)</p>
+                <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;"><em>This is a semester-long capstone project at Auburn University. All designs are proprietary team work.</em></p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p><strong>Survival Mesh Beacon & Battery Bank</strong></p>
+        <p>Auburn University - Electrical and Computer Engineering - Capstone Semester 1</p>
+        <p>Auburn ECE Team 4 - Morgan Reilly, Sky Braley, Sean Whitley, Reagan Wright, Jacob Volkers, Mia Haefner</p>
+        <div class="footer-links">
+            <a href="#status">Status</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#components">Components</a>
+            <a href="#timeline">Timeline</a>
+            <a href="#team">Team</a>
+            <a href="#resources">Resources</a>
+        </div>
+        <p style="margin-top: 20px; font-size: 12px; opacity: 0.8;">Last updated: October 14, 2026</p>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
